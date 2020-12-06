@@ -59,12 +59,16 @@ def ProbabilityIsGood(prob, ref_probs, perc):
     return prob >= np.percentile(ref_probs, perc)
 
 class DGene:
-    def __init__(self, seq, l7, l9, r7, r9, pos):
+    def __init__(self, seq, l7, l9, r7, r9, pos, l7pos, l9pos, r7pos, r9pos):
         self.seq = seq
         self.l7 = l7
         self.l9 = l9
         self.r7 = r7
         self.r9 = r9
+        self.l7pos = l7pos
+        self.l9pos = l9pos
+        self.r7pos = r7pos
+        self.r9pos = r9pos
         self.pos = pos
 
 def HeptamerIsGood(h, all_hs):
@@ -141,13 +145,14 @@ def main(ighd_fasta, output_fasta):
         gene_pos = l7_pos + 7
         if ProbabilityIsGood(l9_prob, left9_probs, quantile) and ProbabilityIsGood(r9_prob, right9_probs, quantile):
             d_genes.append(DGene(d_seq, l7_seq, ighd_locus[l9_pos : l9_pos + 9],
-                                 r7_seq, ighd_locus[r9_pos : r9_pos + 9], gene_pos))
+                                 r7_seq, ighd_locus[r9_pos : r9_pos + 9], gene_pos, l7_pos, l9_pos, r7_pos, r9_pos))
+								 
     print(str(len(d_gene_candidates) - len(d_genes)) + ' candidated were filtered as false-positives')
 
     fh = open(output_fasta, 'w')
     ind = 0
     for d in sorted(d_genes, key = lambda x : x.pos):
-        fh.write('>INDEX:' + str(ind + 1) + '|IGHD' + str(ind + 1) + '|L7:' + d.l7 + '|L9:' + d.l9 + '|R7:' + d.r7 + '|R9:' + d.r9 + '\n')
+        fh.write('>' + 'id:IGHDsearch-d.' + str(ind + 1) + '|L7:' + d.l7 + ',' + str(d.l7pos) + '|L9:' + d.l9 + ',' + str(d.l9pos) + '|R7:' + d.r7 +',' + str(d.r7pos) + '|R9:' + d.r9 + ',' + str(d.r9pos) + '|start:' + str(d.pos) + '|end:' + str(d.pos + len(d.seq)) + '\n')
         fh.write(d.seq + '\n')
         ind += 1
     fh.close()
