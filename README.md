@@ -1,3 +1,5 @@
+Lightly modified to put feature co-ordinates into FASTA headers.
+
 # SEARCH-D
 An algorithm for de novo finding immunoglobulin diversity (D) genes in IGH locus. 
 
